@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateDoctorDto } from './dto/create-doctor.dto';
-import { UpdateDoctorDto } from './dto/update-doctor.dto';
+// services/doctor.service.ts
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateDoctorDto } from "./dto/create-doctor.dto";
+import { UpdateDoctorDto } from "./dto/update-doctor.dto";
+import { InjectModel } from "@nestjs/sequelize";
+import { Doctor } from "./models/doctor.model";
 
 @Injectable()
 export class DoctorService {
-  create(createDoctorDto: CreateDoctorDto) {
-    return 'This action adds a new doctor';
+  constructor(
+    @InjectModel(Doctor)
+    private readonly doctorModel: typeof Doctor
+  ) {}
+
+  async create(createDoctorDto: CreateDoctorDto) {
+    return this.doctorModel.create(createDoctorDto);
   }
 
-  findAll() {
-    return `This action returns all doctor`;
+  async findAll() {
+    return this.doctorModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} doctor`;
+  async findOne(id: number) {
+    const doctor = await this.doctorModel.findByPk(id);
+    if (!doctor) {
+      throw new NotFoundException(`Doctor with ID ${id} not found`);
+    }
+    return doctor;
   }
 
-  update(id: number, updateDoctorDto: UpdateDoctorDto) {
-    return `This action updates a #${id} doctor`;
+  async update(id: number, updateDto: UpdateDoctorDto) {
+    const doctor = await this.findOne(id);
+    return doctor.update(updateDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} doctor`;
+  async remove(id: number) {
+    const doctor = await this.findOne(id);
+    await doctor.destroy();
+    return { message: `Doctor #${id} deleted` };
   }
 }

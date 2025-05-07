@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+// services/notification.service.ts
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateNotificationDto } from "./dto/create-notification.dto";
+import { UpdateNotificationDto } from "./dto/update-notification.dto";
+import { InjectModel } from "@nestjs/sequelize";
+import { Notification } from "./models/notification.model";
 
 @Injectable()
 export class NotificationService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
+  constructor(
+    @InjectModel(Notification)
+    private readonly notificationModel: typeof Notification
+  ) {}
+
+  async create(createNotificationDto: CreateNotificationDto) {
+    return this.notificationModel.create(createNotificationDto);
   }
 
-  findAll() {
-    return `This action returns all notification`;
+  async findAll() {
+    return this.notificationModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
+  async findOne(id: number) {
+    const notification = await this.notificationModel.findByPk(id);
+    if (!notification) {
+      throw new NotFoundException(`Notification with ID ${id} not found`);
+    }
+    return notification;
   }
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
+  async update(id: number, updateDto: UpdateNotificationDto) {
+    const notification = await this.findOne(id);
+    return notification.update(updateDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
+  async remove(id: number) {
+    const notification = await this.findOne(id);
+    await notification.destroy();
+    return { message: `Notification #${id} deleted` };
   }
 }

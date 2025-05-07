@@ -1,26 +1,40 @@
-import { Injectable } from '@nestjs/common';
-import { CreateStaffDto } from './dto/create-staff.dto';
-import { UpdateStaffDto } from './dto/update-staff.dto';
+// services/staff.service.ts
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/sequelize";
+import { Staff } from "./models/staff.model";
+import { CreateStaffDto } from "./dto/create-staff.dto";
+import { UpdateStaffDto } from "./dto/update-staff.dto";
 
 @Injectable()
 export class StaffService {
-  create(createStaffDto: CreateStaffDto) {
-    return 'This action adds a new staff';
+  constructor(
+    @InjectModel(Staff)
+    private readonly staffModel: typeof Staff
+  ) {}
+
+  async create(dto: CreateStaffDto) {
+    return this.staffModel.create(dto);
   }
 
-  findAll() {
-    return `This action returns all staff`;
+  async findAll() {
+    return this.staffModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} staff`;
+  async findOne(id: number) {
+    const staff = await this.staffModel.findByPk(id);
+    if (!staff)
+      throw new NotFoundException(`Staff member with ID ${id} not found`);
+    return staff;
   }
 
-  update(id: number, updateStaffDto: UpdateStaffDto) {
-    return `This action updates a #${id} staff`;
+  async update(id: number, dto: UpdateStaffDto) {
+    const staff = await this.findOne(id);
+    return staff.update(dto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} staff`;
+  async remove(id: number) {
+    const staff = await this.findOne(id);
+    await staff.destroy();
+    return { message: `Staff member #${id} deleted` };
   }
 }

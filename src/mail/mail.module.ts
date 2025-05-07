@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MailService } from './mail.service';
+// import { MailService } from './mail.service';
 import { MailerModule } from "@nestjs-modules/mailer";
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
@@ -34,7 +34,7 @@ import { strict } from 'assert';
       inject: [ConfigService],
     }),
   ],
-  providers: [MailService],
-  exports: [MailService],
+  // providers: [MailService],
+  // exports: [MailService],
 })
 export class MailModule {}

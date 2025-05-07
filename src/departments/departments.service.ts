@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateDepartmentDto } from './dto/create-department.dto';
-import { UpdateDepartmentDto } from './dto/update-department.dto';
+// services/department.service.ts
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateDepartmentDto } from "./dto/create-department.dto";
+import { UpdateDepartmentDto } from "./dto/update-department.dto";
+import { InjectModel } from "@nestjs/sequelize";
+import { Department } from "./models/department.model";
 
 @Injectable()
-export class DepartmentsService {
-  create(createDepartmentDto: CreateDepartmentDto) {
-    return 'This action adds a new department';
+export class DepartmentService {
+  constructor(
+    @InjectModel(Department)
+    private readonly departmentModel: typeof Department
+  ) {}
+
+  async create(createDepartmentDto: CreateDepartmentDto) {
+    return this.departmentModel.create(createDepartmentDto);
   }
 
-  findAll() {
-    return `This action returns all departments`;
+  async findAll() {
+    return this.departmentModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} department`;
+  async findOne(id: number) {
+    const department = await this.departmentModel.findByPk(id);
+    if (!department) {
+      throw new NotFoundException(`Department with ID ${id} not found`);
+    }
+    return department;
   }
 
-  update(id: number, updateDepartmentDto: UpdateDepartmentDto) {
-    return `This action updates a #${id} department`;
+  async update(id: number, updateDto: UpdateDepartmentDto) {
+    const department = await this.findOne(id);
+    return department.update(updateDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} department`;
+  async remove(id: number) {
+    const department = await this.findOne(id);
+    await department.destroy();
+    return { message: `Department #${id} deleted` };
   }
 }

@@ -1,26 +1,66 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import {
+  BadGatewayException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { CreateAdminDto } from "./dto/create-admin.dto";
+import { UpdateAdminDto } from "./dto/update-admin.dto";
+import { InjectModel } from "@nestjs/sequelize";
+
+import * as bcrypt from "bcrypt";
+import { Admin } from "./models/admin.model";
 
 @Injectable()
 export class AdminService {
-  create(createAdminDto: CreateAdminDto) {
-    return 'This action adds a new admin';
+  constructor(@InjectModel(Admin) private readonly adminModel: typeof Admin) {}
+
+  async create(createAdminDto: CreateAdminDto) {
+    const { password, confirm_password } = createAdminDto;
+    if (password !== confirm_password) {
+      throw new BadGatewayException("Parollar mos emas");
+    }
+
+    const hashed_password = await bcrypt.hash(password, 7);
+
+    const newAdmin = await this.adminModel.create({
+      ...createAdminDto,
+      hashed_password,
+    });
+
+    return newAdmin;
   }
 
-  findAll() {
-    return `This action returns all admin`;
+  async findAll() {
+    const admins = await this.adminModel.findAll();
+    return admins;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} admin`;
+  async findOne(id: number) {
+    const admin = await this.adminModel.findByPk(id);
+    if (!admin) {
+      throw new NotFoundException(`ID ${id} ga ega admin topilmadi`);
+    }
+    return admin;
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return `This action updates a #${id} admin`;
+  async update(id: number, updateAdminDto: UpdateAdminDto) {
+    const admin = await this.adminModel.findByPk(id);
+    if (!admin) {
+      throw new NotFoundException(`ID ${id} ga ega admin topilmadi`);
+    }
+
+    await admin.update(updateAdminDto);
+    return admin;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} admin`;
+  async remove(id: number) {
+    const admin = await this.adminModel.findByPk(id);
+    if (!admin) {
+      throw new NotFoundException(`ID ${id} ga ega admin topilmadi`);
+    }
+
+    await admin.destroy();
+    return { message: `Admin ID ${id} o'chirildi` };
   }
 }
