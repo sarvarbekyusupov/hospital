@@ -4,28 +4,28 @@
   ForbiddenException,
   Injectable,
 } from "@nestjs/common";
-// import { UsersService } from "../users/users.service";
+import { UsersService } from "../users/users.service";
 import { JwtSecretRequestType, JwtService } from "@nestjs/jwt";
-// import { User } from "../users/models/user.model";
+import { User } from "../users/models/user.model";
 import { ref } from "process";
-// import { CreateUserDto } from "../users/dto/create-user.dto";
+import { CreateUserDto } from "../users/dto/create-user.dto";
 import { SignInDto } from "./dto/sign-in.dto";
 import * as bcrypt from "bcrypt";
 import { Response } from "express";
 
 @Injectable()
 export class AuthService {
-  // constructor(
-  //   private readonly usersService: UsersService,
-  //   private readonly jwtService: JwtService
-  // ) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService
+  ) {}
 
-  // async generateTokens(user: User) {
-  //   const payload = {
-  //     id: user.id,
-  //     is_active: user.is_active,
-  //     is_owner: user.is_owner,
-  //   };
+  async generateTokens(user: User) {
+    const payload = {
+      id: user.id,
+      is_active: user.is_active,
+      is_owner: user.is_owner,
+    };
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {

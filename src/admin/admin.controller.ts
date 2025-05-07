@@ -1,34 +1,65 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from "@nestjs/common";
+import { AdminService } from "./admin.service";
+import { CreateAdminDto } from "./dto/create-admin.dto";
+import { UpdateAdminDto } from "./dto/update-admin.dto";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+} from "@nestjs/swagger";
 
-@Controller('admin')
+@ApiTags("Admin")
+@Controller("admin")
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post()
+  @ApiOperation({ summary: "Create a new admin" })
+  @ApiBody({ type: CreateAdminDto })
+  @ApiResponse({ status: 201, description: "Admin created successfully" })
   create(@Body() createAdminDto: CreateAdminDto) {
     return this.adminService.create(createAdminDto);
   }
 
   @Get()
+  @ApiOperation({ summary: "Get all admins" })
+  @ApiResponse({ status: 200, description: "List of admins" })
   findAll() {
     return this.adminService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  @ApiOperation({ summary: "Get a specific admin by ID" })
+  @ApiParam({ name: "id", description: "Admin ID" })
+  @ApiResponse({ status: 200, description: "Admin details" })
+  findOne(@Param("id") id: string) {
     return this.adminService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdminDto: UpdateAdminDto) {
+  @Patch(":id")
+  @ApiOperation({ summary: "Update an admin by ID" })
+  @ApiParam({ name: "id", description: "Admin ID" })
+  @ApiBody({ type: UpdateAdminDto })
+  @ApiResponse({ status: 200, description: "Admin updated successfully" })
+  update(@Param("id") id: string, @Body() updateAdminDto: UpdateAdminDto) {
     return this.adminService.update(+id, updateAdminDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  @ApiOperation({ summary: "Delete an admin by ID" })
+  @ApiParam({ name: "id", description: "Admin ID" })
+  @ApiResponse({ status: 200, description: "Admin deleted successfully" })
+  remove(@Param("id") id: string) {
     return this.adminService.remove(+id);
   }
 }

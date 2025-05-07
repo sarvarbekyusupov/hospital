@@ -7,7 +7,7 @@ import { toUSVString } from 'util';
 
 
 @Module({
-  // imports:[JwtModule.register({global:true}), UsersModule],
+  imports:[JwtModule.register({global:true})],
   // controllers: [AuthController],
   // providers: [AuthService],
 })
