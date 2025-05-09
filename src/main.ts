@@ -34,10 +34,8 @@ async function start() {
     app.useGlobalPipes(new ValidationPipe());
 
     const config = new DocumentBuilder()
-      .setTitle("SKIDKACHI API")
-      .setDescription(
-        "SKIDKACHI - Discount Management System API Documentation"
-      )
+      .setTitle("HOSPITAL API")
+      .setDescription("HOSPITAL - Hospital Management System API Documentation")
       .setVersion("1.0")
       .addBearerAuth(
         {

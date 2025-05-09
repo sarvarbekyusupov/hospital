@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-// import { MailService } from './mail.service';
+import { MailService } from './mail.service';
 import { MailerModule } from "@nestjs-modules/mailer";
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
@@ -22,19 +22,20 @@ import { strict } from 'assert';
         defaults: {
           from: `"Skidkachi" <${config.get<string>("SMTP_HOST")}>`,
         },
-        template:{
+        template: {
           dir: join(__dirname, "templates"),
           adapter: new HandlebarsAdapter(),
-          template:'confirmation',
-          options:{
-            strict:true
+          options: {
+            strict: true,
+            partialsDir: join(__dirname, "templates"),
+            defaultLayout: false
           }
         }
       }),
       inject: [ConfigService],
     }),
   ],
-  // providers: [MailService],
-  // exports: [MailService],
+  providers: [MailService],
+  exports: [MailService],
 })
 export class MailModule {}

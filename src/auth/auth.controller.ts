@@ -1,25 +1,34 @@
-/* import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
-// import { AuthService } from './auth.service';
-// import { CreateUserDto } from '../users/dto/create-user.dto';
-import { SignInDto } from './dto/sign-in.dto';
-import { Response } from 'express';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  Req,
+  UseGuards,
+  Get,
+} from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { SignInDto } from "./dto/sign-in.dto";
+import { Response, Request } from "express";
 
-@Controller('auth')
+@Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @Post("sign-up")
-  // async signUp(@Body() createUserDto:CreateUserDto){
-  //   return this.authService.signUp(createUserDto)
-  // }
-
   @Post("sign-in")
   async signIn(
-    @Body() signInDto:SignInDto ,
-    @Res({passthrough:true}) res:Response
-  ){
-    return this.authService.signIn(signInDto, res)
+    @Body() signInDto: SignInDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    return this.authService.signIn(signInDto, res);
   }
-  
+
+  @Post("sign-out")
+  async signOut(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const refreshToken = req.cookies?.refresh_token;
+    return this.authService.signOut(refreshToken, res);
+  }
 }
- */

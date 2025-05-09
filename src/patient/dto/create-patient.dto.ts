@@ -45,18 +45,6 @@ export class CreatePatientDto {
   @IsString()
   emergency_contact: string;
 
-  @ApiProperty({
-    description: "Refresh token for authentication",
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  refresh_token: string;
-
-  @ApiProperty({ description: "Whether the patient is active" })
-  @IsBoolean()
-  is_active: boolean;
-
   @ApiProperty({ description: "Password" })
   @IsString()
   password: string;

@@ -37,4 +37,12 @@ export class StaffService {
     await staff.destroy();
     return { message: `Staff member #${id} deleted` };
   }
+
+  async findByEmail(email: string) {
+    const user = await this.staffModel.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(`Staff with Email: ${email} not found`);
+    }
+    return user;
+  }
 }

@@ -13,7 +13,7 @@ export class DoctorService {
   ) {}
 
   async create(createDoctorDto: CreateDoctorDto) {
-    return this.doctorModel.create(createDoctorDto);
+    // return this.doctorModel.create(createDoctorDto);
   }
 
   async findAll() {
@@ -37,5 +37,13 @@ export class DoctorService {
     const doctor = await this.findOne(id);
     await doctor.destroy();
     return { message: `Doctor #${id} deleted` };
+  }
+
+  async findByEmail(email: string) {
+    const user = await this.doctorModel.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException(`Doctor with Email: ${email} not found`);
+    }
+    return user;
   }
 }

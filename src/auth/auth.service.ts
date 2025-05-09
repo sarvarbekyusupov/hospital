@@ -1,107 +1,100 @@
-/* import {
+import {
   BadRequestException,
-  ConflictException,
   ForbiddenException,
   Injectable,
 } from "@nestjs/common";
-import { UsersService } from "../users/users.service";
-import { JwtSecretRequestType, JwtService } from "@nestjs/jwt";
-import { User } from "../users/models/user.model";
-import { ref } from "process";
-import { CreateUserDto } from "../users/dto/create-user.dto";
 import { SignInDto } from "./dto/sign-in.dto";
 import * as bcrypt from "bcrypt";
 import { Response } from "express";
+import { PatientService } from "../patient/patient.service";
+import { DoctorService } from "../doctor/doctor.service";
+import { AdminService } from "../admin/admin.service";
+import { StaffService } from "../staff/staff.service";
+import { JwtTokenService } from "./JwtService";
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly patientService: PatientService,
+    private readonly doctorService: DoctorService,
+    private readonly adminService: AdminService,
+    private readonly staffService: StaffService,
+    private readonly jwtService: JwtTokenService
   ) {}
 
-  async generateTokens(user: User) {
-    const payload = {
-      id: user.id,
-      is_active: user.is_active,
-      is_owner: user.is_owner,
-    };
+  async signIn(signInDto: SignInDto, res: Response) {
+    const { email, password, role } = signInDto;
 
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        secret: process.env.ACCESS_TOKEN_KEY,
-        expiresIn: process.env.ACCESS_TOKEN_TIME,
-      }),
-
-      this.jwtService.signAsync(payload, {
-        secret: process.env.REFRESH_TOKEN_KEY,
-        expiresIn: process.env.REFRESH_TOKEN_TIME,
-      }),
-    ]);
-
-    return {
-      accessToken,
-      refreshToken,
-    };
-  }
-
-  async signUp(createUserDto: CreateUserDto) {
-    const condidate = await this.usersService.findUserByEmail(
-      createUserDto.email
-    );
-
-    if (condidate) {
-      throw new ConflictException("Bunday email mavjud");
+    let user;
+    switch (role) {
+      case "patient":
+        user = await this.patientService.findByEmail(email);
+        break;
+      case "doctor":
+        user = await this.doctorService.findByEmail(email);
+        break;
+      case "admin":
+        user = await this.adminService.findByEmail(email);
+        break;
+      case "staff":
+        user = await this.staffService.findByEmail(email);
+        break;
+      default:
+        throw new BadRequestException("Invalid role");
     }
 
-    const newUser = await this.usersService.create(createUserDto);
-    return { messsage: "Foydalanuvchi qo'shildi", userId: newUser.id };
-  }
-
-  async signIn(signInDto: SignInDto, res: Response) {
-    const user = await this.usersService.findUserByEmail(signInDto.email);
-
-    if (!user) {
-      throw new BadRequestException("email yoki password notogri");
+    if (!user || !(await bcrypt.compare(password, user.hashed_password))) {
+      throw new BadRequestException("Email or password incorrect");
     }
 
     if (!user.is_active) {
-      throw new BadRequestException("avval emailni tasqidlang");
+      throw new ForbiddenException("Please confirm your email first");
     }
 
-    const isValidPassword = await bcrypt.compare(
-      signInDto.password,
-      user.hashed_password
-    );
-
-    if (!isValidPassword) {
-      throw new BadRequestException("email yoki password notogri");
-    }
-
-    const { accessToken, refreshToken } = await this.generateTokens(user);
+    const payload = { id: user.id, role, is_active: user.is_active, email:user.email };
+ 
+    const { refreshToken , accessToken} = this.jwtService.generateTokens(payload);
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      maxAge: Number(process.env.COOKIE_TIME),
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
-    user.hashed_ref_token = await bcrypt.hash(refreshToken, 7);
+    user.refresh_token = await bcrypt.hash(refreshToken, 7);
     await user.save();
 
-    return {
-      messsage: "user signed in",
-      accessToken,
-    };
+    return { message: "User signed in", accessToken };
   }
 
-  async signOut(refreshToken:string, res:Response){
-    const userData = await this.jwtService.verify(refreshToken, {
-      secret: process.env.REFRESH_TOKEN_KEY,
-    });
+  async signOut(refreshToken: string, res: Response) {
+    const userData = await this.jwtService.verifyRefreshToken(refreshToken) 
 
-    if (!userData) {
-      throw new ForbiddenException("User not verified")
+    const { id, role } = userData;
+
+    let user;
+    switch (role) {
+      case "patient":
+        user = await this.patientService.findOne(id);
+        break;
+      case "doctor":
+        user = await this.doctorService.findOne(id);
+        break;
+      case "admin":
+        user = await this.adminService.findOne(id);
+        break;
+      case "staff":
+        user = await this.staffService.findOne(id);
+        break;
+      default:
+        throw new ForbiddenException("Invalid role");
     }
+
+    if (!user) throw new ForbiddenException("User not found");
+
+    user.hashed_ref_token = null;
+    await user.save();
+
+    res.clearCookie("refresh_token");
+    return { message: "User signed out" };
   }
 }
- */

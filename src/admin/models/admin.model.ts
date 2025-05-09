@@ -37,10 +37,19 @@ export class Admin extends Model<Admin, IAdminCreateAttr> {
   @Column({
     type: DataType.STRING,
   })
-  declare hashed_refresh_token: string;
+  declare role: string;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: true, defaultValue: false })
+  declare is_active: boolean;
 
   @Column({
     type: DataType.STRING,
   })
-  declare role: string;
+  declare refresh_token: string;
+
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+  })
+  declare activation_link: string;
 }

@@ -1,4 +1,5 @@
-export class SignInDto{
-    readonly email:string
-    readonly password:string
+export class SignInDto {
+  email: string;
+  password: string;
+  role: "patient" | "doctor" | "admin" | "staff" | "creatorAdmin";
 }

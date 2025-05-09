@@ -11,9 +11,8 @@ interface IPatientCreationAttrs {
   address: string;
   insurance_provider: string;
   emergency_contact: string;
-  refresh_token: string;
-  is_active: boolean;
   hashed_password: string;
+  role:string
 }
 
 @Table({ tableName: "patients" })
@@ -54,15 +53,23 @@ export class Patient extends Model<Patient, IPatientCreationAttrs> {
   @Column({ type: DataType.STRING, allowNull: true })
   declare emergency_contact: string;
 
-  @ApiProperty({ example: "refreshTokenHere" })
-  @Column({ type: DataType.STRING, allowNull: true })
-  declare refresh_token: string;
-
   @ApiProperty({ example: true })
-  @Column({ type: DataType.BOOLEAN, allowNull: true, defaultValue: true })
+  @Column({ type: DataType.BOOLEAN, allowNull: true, defaultValue: false })
   declare is_active: boolean;
 
   @ApiProperty({ example: "hashedpassword123" })
   @Column({ type: DataType.STRING, allowNull: false })
   declare hashed_password: string;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  declare refresh_token: string;
+
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+  })
+  declare activation_link: string;
+  declare role: string;
 }

@@ -6,6 +6,9 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
+  Req,
+  Res,
 } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { CreateAdminDto } from "./dto/create-admin.dto";
@@ -17,6 +20,7 @@ import {
   ApiParam,
   ApiBody,
 } from "@nestjs/swagger";
+import { Request, Response } from "express";
 
 @ApiTags("Admin")
 @Controller("admin")
@@ -61,5 +65,19 @@ export class AdminController {
   @ApiResponse({ status: 200, description: "Admin deleted successfully" })
   remove(@Param("id") id: string) {
     return this.adminService.remove(+id);
+  }
+
+  @Get("/activate/:link")
+  @ApiOperation({ summary: "Activate a patient account via email link" })
+  @ApiParam({ name: "link", description: "Activation link sent via email" })
+  @ApiResponse({ status: 200, description: "Patient activated successfully" })
+  async activateUser(@Param("link") link: string) {
+    return this.adminService.activateUser(link);
+  }
+
+  @Post("/refresh-token")
+  @HttpCode(200)
+  async refreshTokens(@Req() req: Request, @Res() res: Response) {
+    return this.adminService.refreshTokens(req, res);
   }
 }
