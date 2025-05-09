@@ -109,14 +109,11 @@ export class AdminService {
 
   async refreshTokens(req: Request, res: Response) {
     const refresh_token = req.cookies["refresh_token"];
-    console.log(refresh_token, "bu refresh token");
 
     if (!refresh_token)
       throw new BadRequestException("Refresh Token mavjud emas!");
 
-    const payload = await this.jwtService.verify(refresh_token, {
-      secret: process.env.REFRESH_TOKEN_KEY,
-    });
+    const payload = await this.myjwtService.verifyRefreshToken(refresh_token);
 
     const id = payload.id
     const user = await this.adminModel.findOne({
@@ -129,13 +126,20 @@ export class AdminService {
         "admin topilmadi yoki login qilinmagan"
       );
     }
-    console.log(user);
 
 
     const isValid = await bcrypt.compare(refresh_token, user.refresh_token);
     if (!isValid) throw new UnauthorizedException("Refresh Token noto'g'ri");
 
-    const { accessToken, refreshToken } = await this.myjwtService.generateTokens(user);
+    const { accessToken, refreshToken } =
+      await this.myjwtService.generateTokens({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        is_active: user.is_active,
+      });
+
+    
     const hashed_refresh_token = await bcrypt.hash(refreshToken, 7);
     user.refresh_token = hashed_refresh_token;
     await user.save();

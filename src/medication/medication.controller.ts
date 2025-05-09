@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { MedicationService } from "./medication.service";
 import { CreateMedicationDto } from "./dto/create-medication.dto";
@@ -17,12 +18,16 @@ import {
   ApiBody,
   ApiParam,
 } from "@nestjs/swagger";
+import { UserGuard } from "../common/guards/user.guard";
+import { Roles } from "../common/decorators/role.decorator";
 
 @ApiTags("Medications")
 @Controller("medication")
 export class MedicationController {
   constructor(private readonly medicationService: MedicationService) {}
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Create a new medication" })
   @ApiBody({ type: CreateMedicationDto })
@@ -46,6 +51,8 @@ export class MedicationController {
     return this.medicationService.findOne(+id);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update a medication by ID" })
   @ApiParam({ name: "id", description: "Medication ID" })
@@ -58,6 +65,8 @@ export class MedicationController {
     return this.medicationService.update(+id, updateMedicationDto);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete a medication by ID" })
   @ApiParam({ name: "id", description: "Medication ID" })

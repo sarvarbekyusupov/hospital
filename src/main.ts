@@ -63,7 +63,7 @@ async function start() {
         showExtensions: true,
         showCommonExtensions: true,
       },
-      customSiteTitle: "Daftarim API Documentation",
+      customSiteTitle: "Hospital API Documentation",
     });
 
     await app.listen(PORT);

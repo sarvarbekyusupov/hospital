@@ -7,6 +7,7 @@ interface IStaffCreationAttrs {
   role: string;
   phone: string;
   email: string;
+  hashed_password: string;
 }
 
 @Table({ tableName: "staffs" })
@@ -30,4 +31,23 @@ export class Staff extends Model<Staff, IStaffCreationAttrs> {
   @ApiProperty({ example: "jane.doe@clinic.com" })
   @Column({ type: DataType.STRING, allowNull: true, unique: true })
   declare email: string;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  declare hashed_password: string;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: true, defaultValue: false })
+  declare is_active: boolean;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  declare refresh_token: string;
+
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+  })
+  declare activation_link: string;
 }

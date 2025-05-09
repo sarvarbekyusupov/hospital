@@ -17,7 +17,6 @@ interface IDoctorCreationAttrs {
   department_id: number;
   room_number: string;
   hashed_password: string;
-  is_active: boolean;
 }
 
 @Table({ tableName: "doctors" })
@@ -67,4 +66,20 @@ export class Doctor extends Model<Doctor, IDoctorCreationAttrs> {
   @ApiProperty({ example: true, description: "Is the doctor active?" })
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   declare is_active: boolean;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  declare role: string;
+
+  @Column({
+    type: DataType.STRING,
+  })
+  declare refresh_token: string;
+
+  @Column({
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
+  })
+  declare activation_link: string;
 }

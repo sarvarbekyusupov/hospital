@@ -48,8 +48,7 @@ export class Admin extends Model<Admin, IAdminCreateAttr> {
   declare refresh_token: string;
 
   @Column({
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV4,
+    type: DataType.STRING,
   })
   declare activation_link: string;
 }

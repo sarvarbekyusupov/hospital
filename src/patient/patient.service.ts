@@ -13,15 +13,10 @@ import { InjectModel } from "@nestjs/sequelize";
 import { Patient } from "./models/patient.model";
 import * as bcrypt from "bcrypt";
 import { MailService } from "../mail/mail.service";
-import { JwtTokenService } from '../auth/JwtService';
+import { JwtTokenService } from "../auth/JwtService";
 import { Response as ExpressResponse } from "express";
 import { Request, Response } from "express";
 import { JwtService } from "@nestjs/jwt";
-
-
-
-
-
 
 @Injectable()
 export class PatientService {
@@ -150,9 +145,7 @@ export class PatientService {
     if (!refresh_token)
       throw new BadRequestException("Refresh Token mavjud emas!");
 
-    const payload = await this.jwtService.verify(refresh_token, {
-      secret: process.env.REFRESH_TOKEN_KEY,
-    });
+    const payload = await this.myjwtService.verifyRefreshToken(refresh_token);
 
     const user = await this.patientModel.findOne({
       where: { id: payload.id },
@@ -167,7 +160,13 @@ export class PatientService {
     if (!isValid) throw new UnauthorizedException("Refresh Token noto'g'ri");
 
     const { accessToken, refreshToken } =
-      await this.myjwtService.generateTokens(user);
+      await this.myjwtService.generateTokens({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        is_active: user.is_active,
+      });
+
     const hashed_refresh_token = await bcrypt.hash(refreshToken, 7);
     user.refresh_token = hashed_refresh_token;
     await user.save();

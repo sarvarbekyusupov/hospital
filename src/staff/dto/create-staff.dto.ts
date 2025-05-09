@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsPhoneNumber } from "class-validator";
+import { IsString, IsEmail, IsPhoneNumber, MinLength } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateStaffDto {
@@ -17,4 +17,14 @@ export class CreateStaffDto {
   @ApiProperty({ example: "jane.doe@example.com" })
   @IsEmail()
   email: string;
+
+  @ApiProperty({ description: "Password (at least 6 characters)" })
+  @IsString()
+  @MinLength(6)
+  password: string;
+
+  @ApiProperty({ description: "Password confirmation (must match password)" })
+  @IsString()
+  @MinLength(6)
+  confirm_password: string;
 }

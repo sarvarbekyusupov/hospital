@@ -47,7 +47,5 @@ export class CreateDoctorDto {
   @MinLength(6)
   confirm_password: string;
 
-  @ApiProperty({ description: "Whether the doctor is currently active" })
-  @IsBoolean()
-  is_active: boolean;
+ 
 }

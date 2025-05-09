@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { MedicalRecordService } from "./medical_record.service";
 import { CreateMedicalRecordDto } from "./dto/create-medical_record.dto";
@@ -17,12 +18,16 @@ import {
   ApiParam,
   ApiBody,
 } from "@nestjs/swagger";
+import { UserGuard } from "../common/guards/user.guard";
+import { Roles } from "../common/decorators/role.decorator";
 
 @ApiTags("Medical Records")
 @Controller("medical-record")
 export class MedicalRecordController {
   constructor(private readonly medicalRecordService: MedicalRecordService) {}
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Create a new medical record" })
   @ApiBody({ type: CreateMedicalRecordDto })
@@ -49,6 +54,8 @@ export class MedicalRecordController {
     return this.medicalRecordService.findOne(+id);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update a medical record by ID" })
   @ApiParam({ name: "id", description: "Medical record ID" })
@@ -64,6 +71,8 @@ export class MedicalRecordController {
     return this.medicalRecordService.update(+id, updateMedicalRecordDto);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete a medical record by ID" })
   @ApiParam({ name: "id", description: "Medical record ID" })

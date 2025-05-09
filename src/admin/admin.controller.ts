@@ -9,6 +9,7 @@ import {
   HttpCode,
   Req,
   Res,
+  UseGuards,
 } from "@nestjs/common";
 import { AdminService } from "./admin.service";
 import { CreateAdminDto } from "./dto/create-admin.dto";
@@ -21,12 +22,16 @@ import {
   ApiBody,
 } from "@nestjs/swagger";
 import { Request, Response } from "express";
+import { UserGuard } from "../common/guards/user.guard";
+import { Roles } from "../common/decorators/role.decorator";
 
 @ApiTags("Admin")
 @Controller("admin")
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @UseGuards(UserGuard)
+  @Roles("superAdmin")
   @Post()
   @ApiOperation({ summary: "Create a new admin" })
   @ApiBody({ type: CreateAdminDto })
@@ -35,6 +40,8 @@ export class AdminController {
     return this.adminService.create(createAdminDto);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Get()
   @ApiOperation({ summary: "Get all admins" })
   @ApiResponse({ status: 200, description: "List of admins" })
@@ -42,6 +49,8 @@ export class AdminController {
     return this.adminService.findAll();
   }
 
+  @UseGuards(UserGuard)
+  @Roles("superAdmin")
   @Get(":id")
   @ApiOperation({ summary: "Get a specific admin by ID" })
   @ApiParam({ name: "id", description: "Admin ID" })
@@ -50,6 +59,8 @@ export class AdminController {
     return this.adminService.findOne(+id);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("superAdmin")
   @Patch(":id")
   @ApiOperation({ summary: "Update an admin by ID" })
   @ApiParam({ name: "id", description: "Admin ID" })
@@ -59,6 +70,8 @@ export class AdminController {
     return this.adminService.update(+id, updateAdminDto);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("superAdmin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete an admin by ID" })
   @ApiParam({ name: "id", description: "Admin ID" })

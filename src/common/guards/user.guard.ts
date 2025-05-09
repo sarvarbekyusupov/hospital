@@ -1,60 +1,56 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
   Injectable,
   UnauthorizedException,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { log } from 'console';
-import { Observable } from 'rxjs';
+  BadRequestException,
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { JwtService } from "@nestjs/jwt";
+import { ROLES_KEY } from "../decorators/role.decorator";
 
 @Injectable()
 export class UserGuard implements CanActivate {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly reflector: Reflector
+  ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const authHeader = req.header.authorization;
+    const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      throw new UnauthorizedException('Unauthorized user');
+    if (!authHeader) throw new UnauthorizedException("Unauthorized user");
+
+    const [bearer, token] = authHeader.split(" ");
+    if (bearer !== "Bearer" || !token)
+      throw new UnauthorizedException("Unauthorized user");
+
+    let payload: any;
+    try {
+      payload = await this.jwtService.verify(token, {
+        secret: process.env.ACCESS_TOKEN_KEY,
+      });
+    } catch (error) {
+      throw new BadRequestException("Token invalid or expired");
     }
 
-    const bearer = authHeader.split(' ')[0];
-    const token = authHeader.split(' ')[1];
-
-    if (bearer !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Unauthorized user');
+    if (!payload?.is_active) {
+      throw new ForbiddenException("User is not active");
     }
 
-    async function verify(token: string, jwtService: JwtService) {
-      let payload: any;
-      try {
-        payload = await jwtService.verify(token, {
-          secret: process.env.ACCESS_TOKEN_KEY,
-        });
-      } catch (error) {
-        console.log(error);
-        throw new BadRequestException(error);
-      }
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()]
+    );
 
-      if (!payload) {
-        throw new UnauthorizedException('Unauthorized user');
-      }
-
-      
-      if (!payload.is_active) {
-        throw new ForbiddenException('Ruxsat etilmgan user');
-      }
-
-      req.user = payload
-      return true
-
+    if (requiredRoles && !requiredRoles.includes(payload.role)) {
+      throw new ForbiddenException("You do not have permission");
     }
-    return verify(token, this.jwtService)
+
+    req.user = payload;
+    return true;
   }
 }
+

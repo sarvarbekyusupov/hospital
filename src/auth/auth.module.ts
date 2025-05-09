@@ -14,9 +14,9 @@ import { StaffModule } from "../staff/staff.module";
   imports: [
     JwtModule.register({ global: true }),
     forwardRef(() => PatientModule), // Handles circular dep with PatientService
-    DoctorModule,
     forwardRef(() => AdminModule),
-    StaffModule,
+    forwardRef(() => DoctorModule),
+    forwardRef(() => StaffModule),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtTokenService],

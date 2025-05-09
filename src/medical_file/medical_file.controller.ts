@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { MedicalFileService } from "./medical_file.service";
 import { CreateMedicalFileDto } from "./dto/create-medical_file.dto";
@@ -17,12 +18,16 @@ import {
   ApiParam,
   ApiBody,
 } from "@nestjs/swagger";
+import { UserGuard } from "../common/guards/user.guard";
+import { Roles } from "../common/decorators/role.decorator";
 
 @ApiTags("Medical Files")
 @Controller("medical-file")
 export class MedicalFileController {
   constructor(private readonly medicalFileService: MedicalFileService) {}
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Create a new medical file" })
   @ApiBody({ type: CreateMedicalFileDto })
@@ -49,6 +54,8 @@ export class MedicalFileController {
     return this.medicalFileService.findOne(+id);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update a medical file by ID" })
   @ApiParam({ name: "id", description: "Medical file ID" })
@@ -64,6 +71,8 @@ export class MedicalFileController {
     return this.medicalFileService.update(+id, updateMedicalFileDto);
   }
 
+  @UseGuards(UserGuard)
+  @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete a medical file by ID" })
   @ApiParam({ name: "id", description: "Medical file ID" })
