@@ -30,8 +30,8 @@ import { Roles } from "../common/decorators/role.decorator";
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @UseGuards(UserGuard)
-  @Roles("superAdmin")
+  // @UseGuards(UserGuard)
+  // @Roles("superAdmin")
   @Post()
   @ApiOperation({ summary: "Create a new admin" })
   @ApiBody({ type: CreateAdminDto })
@@ -40,8 +40,8 @@ export class AdminController {
     return this.adminService.create(createAdminDto);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Get()
   @ApiOperation({ summary: "Get all admins" })
   @ApiResponse({ status: 200, description: "List of admins" })
@@ -50,8 +50,8 @@ export class AdminController {
   }
 
   @UseGuards(UserGuard)
-  @Roles("superAdmin")
-  @Get(":id")
+  // @Roles("superAdmin")
+  // @Get(":id")
   @ApiOperation({ summary: "Get a specific admin by ID" })
   @ApiParam({ name: "id", description: "Admin ID" })
   @ApiResponse({ status: 200, description: "Admin details" })
@@ -60,8 +60,8 @@ export class AdminController {
   }
 
   @UseGuards(UserGuard)
-  @Roles("superAdmin")
-  @Patch(":id")
+  // @Roles("superAdmin")
+  // @Patch(":id")
   @ApiOperation({ summary: "Update an admin by ID" })
   @ApiParam({ name: "id", description: "Admin ID" })
   @ApiBody({ type: UpdateAdminDto })
@@ -71,8 +71,8 @@ export class AdminController {
   }
 
   @UseGuards(UserGuard)
-  @Roles("superAdmin")
-  @Delete(":id")
+  // @Roles("superAdmin")
+  // @Delete(":id")
   @ApiOperation({ summary: "Delete an admin by ID" })
   @ApiParam({ name: "id", description: "Admin ID" })
   @ApiResponse({ status: 200, description: "Admin deleted successfully" })

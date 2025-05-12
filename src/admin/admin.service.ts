@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  ServiceUnavailableException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { CreateAdminDto } from "./dto/create-admin.dto";
@@ -21,7 +22,8 @@ export class AdminService {
   constructor(
     @InjectModel(Admin) private readonly adminModel: typeof Admin,
     private readonly myjwtService: JwtTokenService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    
   ) {}
 
   async create(createAdminDto: CreateAdminDto) {
@@ -36,6 +38,8 @@ export class AdminService {
       ...createAdminDto,
       hashed_password,
     });
+
+   
 
     return newAdmin;
   }
@@ -135,7 +139,7 @@ export class AdminService {
       await this.myjwtService.generateTokens({
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: "admin",
         is_active: user.is_active,
       });
 

@@ -27,4 +27,5 @@ export class CreateStaffDto {
   @IsString()
   @MinLength(6)
   confirm_password: string;
+
 }

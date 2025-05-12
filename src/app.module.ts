@@ -9,7 +9,6 @@ import { MedicationModule } from "./medication/medication.module";
 import { PrescriptionItemModule } from "./prescription_item/prescription_item.module";
 import { LabTestModule } from "./lab_test/lab_test.module";
 import { MedicalRecordModule } from "./medical_record/medical_record.module";
-import { MedicalFileModule } from "./medical_file/medical_file.module";
 import { PrescriptionModule } from "./prescription/prescription.module";
 import { DoctorModule } from "./doctor/doctor.module";
 import { DepartmentsModule } from "./departments/departments.module";
@@ -22,7 +21,6 @@ import { Department } from "./departments/models/department.model";
 import { Doctor } from "./doctor/models/doctor.model";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { LabTest } from "./lab_test/models/lab_test.model";
-import { MedicalFile } from "./medical_file/models/medical_file.model";
 import { MedicalRecord } from "./medical_record/models/medical_record.model";
 import { Medication } from "./medication/models/medication.model";
 import { Notification } from "./notification/models/notification.model";
@@ -49,7 +47,6 @@ import { Staff } from "./staff/models/staff.model";
        Department,
        Doctor,
        LabTest,
-       MedicalFile,
        MedicalRecord,
        Medication,
        Notification,
@@ -74,7 +71,6 @@ import { Staff } from "./staff/models/staff.model";
     PrescriptionItemModule,
     LabTestModule,
     MedicalRecordModule,
-    MedicalFileModule,
     PrescriptionModule,
     DoctorModule,
     DepartmentsModule,

@@ -4,9 +4,10 @@ import { DoctorController } from './doctor.controller';
 import { Doctor } from './models/doctor.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthModule } from '../auth/auth.module';
+import { Appointment } from '../appointment/models/appointment.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Doctor]),forwardRef(() => AuthModule)],
+  imports: [SequelizeModule.forFeature([Doctor, Appointment]),forwardRef(() => AuthModule)],
   controllers: [DoctorController],
   providers: [DoctorService],
   exports:[DoctorService]

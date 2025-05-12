@@ -7,6 +7,9 @@ import { UpdateStaffDto } from "./dto/update-staff.dto";
 import { Request, Response } from "express";
 import { JwtTokenService } from "../auth/JwtService";
 import * as bcrypt from "bcrypt";
+import { Doctor } from "../doctor/models/doctor.model";
+import { Department } from "../departments/models/department.model";
+import { CreateDepartmentDto } from "../departments/dto/create-department.dto";
 
 
 @Injectable()
@@ -14,23 +17,24 @@ export class StaffService {
   constructor(
     @InjectModel(Staff)
     private readonly staffModel: typeof Staff,
-    private readonly myjwtService: JwtTokenService,
+    private readonly myjwtService: JwtTokenService
   ) {}
 
   async create(dto: CreateStaffDto) {
+    
     const { password, confirm_password } = dto;
-        if (password !== confirm_password) {
-          throw new BadGatewayException("Parollar mos emas");
-        }
-    
-        const hashed_password = await bcrypt.hash(password, 7);
-    
-        const newStaff = await this.staffModel.create({
-          ...dto,
-          hashed_password,
-        });
-    
-        return newStaff;
+    if (password !== confirm_password) {
+      throw new BadGatewayException("Parollar mos emas");
+    }
+
+    const hashed_password = await bcrypt.hash(password, 7);
+
+    const newStaff = await this.staffModel.create({
+      ...dto,
+      hashed_password,
+    });
+
+    return newStaff;
   }
 
   async findAll() {
@@ -113,7 +117,7 @@ export class StaffService {
       await this.myjwtService.generateTokens({
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: "staff",
         is_active: user.is_active,
       });
 

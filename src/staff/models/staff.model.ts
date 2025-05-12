@@ -1,6 +1,7 @@
 // models/staff.model.ts
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
+import { Department } from "../../departments/models/department.model";
 
 interface IStaffCreationAttrs {
   full_name: string;
@@ -50,4 +51,11 @@ export class Staff extends Model<Staff, IStaffCreationAttrs> {
     defaultValue: DataType.UUIDV4,
   })
   declare activation_link: string;
+
+  @ForeignKey(() => Department)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  declare department_id: number;
+
+  @BelongsTo(() => Department)
+  declare department: Department;
 }

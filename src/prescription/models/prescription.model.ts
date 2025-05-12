@@ -1,6 +1,15 @@
-// models/prescription.model.ts
-import { Table, Column, Model, DataType } from "sequelize-typescript";
-import { ApiProperty } from "@nestjs/swagger";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
+} from "sequelize-typescript";
+import { Patient } from "../../patient/models/patient.model";
+import { Doctor } from "../../doctor/models/doctor.model";
+import { PrescriptionItem } from "../../prescription_item/models/prescription_item.model";
 
 interface IPrescriptionCreationAttrs {
   patient_id: number;
@@ -13,19 +22,26 @@ export class Prescription extends Model<
   Prescription,
   IPrescriptionCreationAttrs
 > {
-  @ApiProperty({ example: 1, description: "Unique identifier" })
   @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
   declare id: number;
 
-  @ApiProperty({ example: 3 })
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @ForeignKey(() => Patient)
+  @Column({ type: DataType.INTEGER, allowNull: false })
   declare patient_id: number;
 
-  @ApiProperty({ example: 7 })
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @ForeignKey(() => Doctor)
+  @Column({ type: DataType.INTEGER, allowNull: false })
   declare doctor_id: number;
 
-  @ApiProperty({ example: "2025-05-07T12:00:00Z" })
-  @Column({ type: DataType.DATE, allowNull: true })
+  @Column({ type: DataType.DATE, allowNull: true, defaultValue: DataType.NOW })
   declare created_at: Date;
+
+  @BelongsTo(() => Patient)
+  declare patient: Patient;
+
+  @BelongsTo(() => Doctor)
+  declare doctor: Doctor;
+
+  @HasMany(() => PrescriptionItem)
+  declare prescriptionItems: PrescriptionItem[];
 }

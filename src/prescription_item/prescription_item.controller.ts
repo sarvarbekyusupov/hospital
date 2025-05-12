@@ -22,8 +22,8 @@ export class PrescriptionItemController {
     private readonly prescriptionItemService: PrescriptionItemService
   ) {}
 
-  @UseGuards(UserGuard)
-  @Roles("doctor", "admin")
+  // @UseGuards(UserGuard)
+  // @Roles("doctor", "admin")
   @Post()
   @ApiOperation({ summary: "Create a prescription item" })
   @ApiResponse({
@@ -34,8 +34,8 @@ export class PrescriptionItemController {
     return this.prescriptionItemService.create(createPrescriptionItemDto);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("doctor", "admin")
+  // @UseGuards(UserGuard)
+  // @Roles("doctor", "admin")
   @Get()
   @ApiOperation({ summary: "Get all prescription items" })
   @ApiResponse({
@@ -46,8 +46,8 @@ export class PrescriptionItemController {
     return this.prescriptionItemService.findAll();
   }
 
-  @UseGuards(UserGuard)
-  @Roles("doctor", "admin")
+  // @UseGuards(UserGuard)
+  // @Roles("doctor", "admin")
   @Get(":id")
   @ApiOperation({ summary: "Get a specific prescription item by ID" })
   @ApiResponse({
@@ -58,8 +58,8 @@ export class PrescriptionItemController {
     return this.prescriptionItemService.findOne(+id);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("doctor", "admin")
+  // @UseGuards(UserGuard)
+  // @Roles("doctor", "admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update a prescription item by ID" })
   @ApiResponse({
@@ -73,8 +73,8 @@ export class PrescriptionItemController {
     return this.prescriptionItemService.update(+id, updatePrescriptionItemDto);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("doctor", "admin")
+  // @UseGuards(UserGuard)
+  // @Roles("doctor", "admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete a prescription item by ID" })
   @ApiResponse({

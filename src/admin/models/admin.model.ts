@@ -4,7 +4,7 @@ interface IAdminCreateAttr {
   name: string;
   email: string;
   hashed_password: string;
-  role: string;
+  role?: string;
 }
 
 @Table({ tableName: "Admin" })
@@ -24,7 +24,7 @@ export class Admin extends Model<Admin, IAdminCreateAttr> {
 
   @Column({
     type: DataType.STRING,
-    // unique: true,
+    unique: true,
     allowNull: false,
   })
   declare email: string;
@@ -36,6 +36,8 @@ export class Admin extends Model<Admin, IAdminCreateAttr> {
 
   @Column({
     type: DataType.STRING,
+    allowNull: true,
+    defaultValue: "admin",
   })
   declare role: string;
 
@@ -48,7 +50,8 @@ export class Admin extends Model<Admin, IAdminCreateAttr> {
   declare refresh_token: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
   })
   declare activation_link: string;
 }

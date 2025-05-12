@@ -26,8 +26,8 @@ import { Roles } from "../common/decorators/role.decorator";
 export class LabTestController {
   constructor(private readonly labTestService: LabTestService) {}
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Create a new lab test" })
   @ApiBody({ type: CreateLabTestDto })
@@ -51,8 +51,8 @@ export class LabTestController {
     return this.labTestService.findOne(+id);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update a lab test by ID" })
   @ApiParam({ name: "id", description: "Lab test ID" })
@@ -62,8 +62,8 @@ export class LabTestController {
     return this.labTestService.update(+id, updateLabTestDto);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete a lab test by ID" })
   @ApiParam({ name: "id", description: "Lab test ID" })

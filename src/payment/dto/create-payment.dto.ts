@@ -22,11 +22,11 @@ export class CreatePaymentDto {
   @IsString()
   status: string;
 
-  @ApiProperty({
-    description: "Timestamp of when the payment was made",
-    type: String,
-    format: "date-time",
-  })
-  @IsDateString()
-  paid_at: Date;
+//   @ApiProperty({
+//     description: "Timestamp of when the payment was made",
+//     type: String,
+//     format: "date-time",
+//   })
+//   @IsDateString()
+//   paid_at: Date;
 }

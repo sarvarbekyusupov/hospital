@@ -27,6 +27,6 @@ export class CreateNotificationDto {
     type: String,
     format: "date-time",
   })
-  @IsDate()
+  // @IsDate()
   sent_at: Date;
 }

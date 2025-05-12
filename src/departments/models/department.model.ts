@@ -1,5 +1,7 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
+import { Doctor } from "../../doctor/models/doctor.model";
+import { Staff } from "../../staff/models/staff.model";
 
 interface IDepartmentCreationAttrs {
   name: string;
@@ -22,4 +24,10 @@ export class Department extends Model<Department, IDepartmentCreationAttrs> {
   })
   @Column({ type: DataType.TEXT, allowNull: true })
   declare description: string;
+
+  @HasMany(() => Doctor)
+  declare doctors: Doctor[];
+
+  @HasMany(() => Staff)
+  declare staffs: Staff[];
 }

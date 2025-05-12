@@ -43,6 +43,8 @@ export class AuthService {
         throw new BadRequestException("Invalid role");
     }
 
+    console.log(user)
+
     if (!user || !(await bcrypt.compare(password, user.hashed_password))) {
       throw new BadRequestException("Email or password incorrect");
     }

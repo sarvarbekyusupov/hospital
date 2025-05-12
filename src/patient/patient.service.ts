@@ -17,12 +17,20 @@ import { JwtTokenService } from "../auth/JwtService";
 import { Response as ExpressResponse } from "express";
 import { Request, Response } from "express";
 import { JwtService } from "@nestjs/jwt";
+import { Prescription } from "../prescription/models/prescription.model";
+import { PrescriptionItem } from "../prescription_item/models/prescription_item.model";
+import { Medication } from "../medication/models/medication.model";
+import { Doctor } from "../doctor/models/doctor.model";
+import { MedicalRecord } from "../medical_record/models/medical_record.model";
+import { LabTest } from "../lab_test/models/lab_test.model";
 
 @Injectable()
 export class PatientService {
   constructor(
     @InjectModel(Patient)
     private readonly patientModel: typeof Patient,
+    @InjectModel(Prescription) // Prescription uchun @InjectModel qo‘shildi
+    private readonly prescriptionModel: typeof Prescription,
     private readonly mailService: MailService,
     private readonly myjwtService: JwtTokenService,
     private readonly jwtService: JwtService
@@ -109,37 +117,6 @@ export class PatientService {
     };
   }
 
-  // async refreshTokens(id: number, token: string, res: ExpressResponse) {
-  //   const patient = await this.patientModel.findOne({
-  //     where: { refresh_token: token },
-  //   });
-  //   console.log("id", id);
-  //   console.log("patient", patient);
-
-  //   if (!patient || !patient.refresh_token) {
-  //     throw new ForbiddenException("Access Denied");
-  //   }
-
-  //   const isMatch = await bcrypt.compare(token, patient.refresh_token);
-  //   if (!isMatch) {
-  //     throw new ForbiddenException("Invalid refresh token");
-  //   }
-
-  //   const payload = { id: patient.id, role: "patient" };
-  //   const tokens = this.jwtService.generateTokens(payload);
-
-  //   await patient.update({
-  //     refresh_token: await bcrypt.hash(tokens.refreshToken, 7),
-  //   });
-
-  //   res.cookie("refresh_token", tokens.refreshToken, {
-  //     httpOnly: true,
-  //     maxAge: Number(process.env.COOKIE_TIME),
-  //   });
-
-  //   return { accessToken: tokens.accessToken };
-  // }
-
   async refreshTokens(req: Request, res: Response) {
     const refresh_token = req.cookies["refresh_token"];
     if (!refresh_token)
@@ -159,11 +136,12 @@ export class PatientService {
     const isValid = await bcrypt.compare(refresh_token, user.refresh_token);
     if (!isValid) throw new UnauthorizedException("Refresh Token noto'g'ri");
 
+    // console.log(user)
     const { accessToken, refreshToken } =
       await this.myjwtService.generateTokens({
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: "patient",
         is_active: user.is_active,
       });
 
@@ -180,4 +158,81 @@ export class PatientService {
       token: accessToken,
     });
   }
+
+  async getMedicationsForPatient(patientId: number): Promise<any[]> {
+    const prescriptions = await this.prescriptionModel.findAll({
+      where: { patient_id: patientId },
+      include: [
+        {
+          model: PrescriptionItem,
+          include: [Medication],
+        },
+      ],
+    });
+
+    return prescriptions.map((prescription) => ({
+      prescription_id: prescription.id,
+      created_at: prescription.created_at,
+      medications: prescription.prescriptionItems.map((item) => ({
+        name: item.medication?.name,
+        dosage: item.dosage,
+        frequency: item.frequency,
+        duration: item.duration,
+      })),
+    }));
+  }
+
+  async getPatientMedicalHistory(patientId: number, user: any){
+   
+    const patient = await this.patientModel.findOne({
+      where: { id: patientId },
+      attributes: ['id', 'full_name', 'email', 'birth_date', 'gender'],
+      include: [
+        {
+          model: MedicalRecord,
+          attributes: ['id', 'diagnosis', 'treatment', 'created_at'],
+          include: [
+            {
+              model: Doctor,
+              attributes: ['full_name', 'specialization'],
+            },
+          ],
+        },
+        {
+          model: Prescription,
+          attributes: ['id', 'created_at'],
+          include: [
+            {
+              model: PrescriptionItem,
+              attributes: ['dosage', 'frequency', 'duration'],
+              include: [
+                {
+                  model: Medication,
+                  attributes: ['name', 'dosage_form'],
+                },
+              ],
+            },
+            {
+              model: Doctor,
+              attributes: ['full_name', 'specialization'],
+            },
+          ],
+        },
+        {
+          model: LabTest,
+          attributes: ['id', 'test_type', 'status', 'result', 'date'],
+          include: [
+            {
+              model: Doctor,
+              attributes: ['full_name', 'specialization'],
+            },
+          ],
+        },
+      ],
+    });
+
+    return patient
+  }
+
+  
 }

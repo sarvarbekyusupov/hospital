@@ -13,18 +13,21 @@ import { Doctor } from "./models/doctor.model";
 import { Request, Response } from "express";
 import { JwtTokenService } from "../auth/JwtService";
 import * as bcrypt from "bcrypt";
-
+import { Appointment } from "../appointment/models/appointment.model";
+import { Op } from "sequelize";
 
 @Injectable()
 export class DoctorService {
   constructor(
     @InjectModel(Doctor)
     private readonly doctorModel: typeof Doctor,
-    private readonly myjwtService: JwtTokenService
+    private readonly myjwtService: JwtTokenService,
+    @InjectModel(Appointment)
+    private readonly appointmentModel: typeof Appointment
   ) {}
 
   async create(createDoctorDto: CreateDoctorDto) {
-const { password, confirm_password } = createDoctorDto;
+    const { password, confirm_password } = createDoctorDto;
     if (password !== confirm_password) {
       throw new BadGatewayException("Parollar mos emas");
     }
@@ -36,7 +39,8 @@ const { password, confirm_password } = createDoctorDto;
       hashed_password,
     });
 
-    return newDoctor;  }
+    return newDoctor;
+  }
 
   async findAll() {
     return this.doctorModel.findAll();
@@ -119,7 +123,7 @@ const { password, confirm_password } = createDoctorDto;
       await this.myjwtService.generateTokens({
         id: user.id,
         email: user.email,
-        role: user.role,
+        role: "doctor",
         is_active: user.is_active,
       });
 
@@ -135,5 +139,36 @@ const { password, confirm_password } = createDoctorDto;
       success: true,
       token: accessToken,
     });
+  }
+
+  async hasActiveAppointments(doctorId: number): Promise<{
+    hasActiveAppointments: boolean;
+    message: string;
+    appointments?: any[];
+  }> {
+    if (isNaN(doctorId)) {
+      throw new BadRequestException("Invalid doctorId: must be a number.");
+    }
+
+    const now = new Date();
+
+    const appointments = await this.appointmentModel.findAll({
+      where: {
+        doctor_id: doctorId,
+        appointment_time: {
+          [Op.gt]: now,
+        },
+      },
+    });
+
+    const hasActiveAppointments = appointments.length > 0;
+
+    return {
+      hasActiveAppointments,
+      message: hasActiveAppointments
+        ? "Doctor has active (upcoming) appointments."
+        : "Doctor does not have any active (upcoming) appointments.",
+      appointments,
+    };
   }
 }

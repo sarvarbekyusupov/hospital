@@ -1,57 +1,52 @@
-// models/appointment.model.ts
 import {
   Table,
   Column,
   Model,
   DataType,
   ForeignKey,
+  BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
-import { ApiProperty } from "@nestjs/swagger";
-// import { Patient } from "./patient.model"; // Update path accordingly
-// import { Doctor } from "./doctor.model"; // Update path accordingly
+import { Patient } from "../../patient/models/patient.model";
+import { Doctor } from "../../doctor/models/doctor.model";
+import { Payment } from "../../payment/models/payment.model";
 
 interface IAppointmentCreationAttrs {
   patient_id: number;
   doctor_id: number;
   appointment_time: Date;
-  status: string;
-  notes: string;
+  status?: string;
+  notes?: string;
 }
 
 @Table({ tableName: "appointments" })
 export class Appointment extends Model<Appointment, IAppointmentCreationAttrs> {
-  @ApiProperty({ example: 1, description: "Appointment ID" })
   @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
   declare id: number;
 
-  @ApiProperty({ example: 2, description: "Patient ID" })
-//   @ForeignKey(() => Patient)
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @ForeignKey(() => Patient)
+  @Column({ type: DataType.INTEGER, allowNull: false })
   declare patient_id: number;
 
-  @ApiProperty({ example: 4, description: "Doctor ID" })
-//   @ForeignKey(() => Doctor)
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @ForeignKey(() => Doctor)
+  @Column({ type: DataType.INTEGER, allowNull: false })
   declare doctor_id: number;
 
-  @ApiProperty({
-    example: "2025-05-07T14:30:00Z",
-    description: "Appointment time",
-  })
-  @Column({ type: DataType.DATE, allowNull: true })
+  @Column({ type: DataType.DATE, allowNull: false })
   declare appointment_time: Date;
 
-  @ApiProperty({
-    example: "scheduled",
-    description: "Status of the appointment",
-  })
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: "scheduled" })
   declare status: string;
 
-  @ApiProperty({
-    example: "Follow-up in two weeks",
-    description: "Additional notes",
-  })
   @Column({ type: DataType.TEXT, allowNull: true })
   declare notes: string;
+
+  @BelongsTo(() => Patient)
+  declare patient: Patient;
+
+  @BelongsTo(() => Doctor)
+  declare doctor: Doctor;
+
+  @HasMany(() => Payment)
+  declare payments: Payment[];
 }

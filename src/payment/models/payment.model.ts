@@ -1,43 +1,51 @@
-// models/payment.model.ts
-import { Table, Column, Model, DataType } from "sequelize-typescript";
-import { ApiProperty } from "@nestjs/swagger";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import { Patient } from "../../patient/models/patient.model";
+import { Appointment } from "../../appointment/models/appointment.model";
 
 interface IPaymentCreationAttrs {
   patient_id: number;
   appointment_id: number;
-  amount: number;
-  method: string;
-  status: string;
-  paid_at: Date;
+  amount?: number;
+  method?: string;
+  status?: string;
+  paid_at?: Date;
 }
 
 @Table({ tableName: "payments" })
 export class Payment extends Model<Payment, IPaymentCreationAttrs> {
-  @ApiProperty({ example: 1, description: "Unique identifier" })
   @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
   declare id: number;
 
-  @ApiProperty({ example: 10 })
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @ForeignKey(() => Patient)
+  @Column({ type: DataType.INTEGER, allowNull: false })
   declare patient_id: number;
 
-  @ApiProperty({ example: 5 })
-  @Column({ type: DataType.INTEGER, allowNull: true })
+  @ForeignKey(() => Appointment)
+  @Column({ type: DataType.INTEGER, allowNull: false })
   declare appointment_id: number;
 
-  @ApiProperty({ example: 99.99 })
-  @Column({ type: DataType.DECIMAL, allowNull: true })
+  @Column({ type: DataType.DECIMAL(10, 2), allowNull: true })
   declare amount: number;
 
-  @ApiProperty({ example: "credit_card" })
   @Column({ type: DataType.STRING, allowNull: true })
   declare method: string;
 
-  @ApiProperty({ example: "paid" })
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column({ type: DataType.STRING, allowNull: true, defaultValue: "paid" })
   declare status: string;
 
-  @ApiProperty({ example: "2024-05-07T14:30:00Z" })
-  @Column({ type: DataType.DATE, allowNull: true })
+  @Column({ type: DataType.DATE, allowNull: true, defaultValue: DataType.NOW })
   declare paid_at: Date;
+
+  @BelongsTo(() => Patient)
+  declare patient: Patient;
+
+  @BelongsTo(() => Appointment)
+  declare appointment: Appointment;
 }

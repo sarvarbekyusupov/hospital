@@ -1,6 +1,11 @@
 // models/patient.model.ts
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
+import { Appointment } from "../../appointment/models/appointment.model";
+import { Payment } from "../../payment/models/payment.model";
+import { MedicalRecord } from "../../medical_record/models/medical_record.model";
+import { LabTest } from "../../lab_test/models/lab_test.model";
+import { Prescription } from "../../prescription/models/prescription.model";
 
 interface IPatientCreationAttrs {
   full_name: string;
@@ -38,7 +43,7 @@ export class Patient extends Model<Patient, IPatientCreationAttrs> {
   declare phone: string;
 
   @ApiProperty({ example: "john@example.com" })
-  @Column({ type: DataType.STRING, allowNull: true })
+  @Column({ type: DataType.STRING, allowNull: true, unique:true })
   declare email: string;
 
   @ApiProperty({ example: "123 Main St" })
@@ -72,4 +77,20 @@ export class Patient extends Model<Patient, IPatientCreationAttrs> {
   })
   declare activation_link: string;
   declare role: string;
+
+  @HasMany(() => Appointment)
+  appointments: Appointment[];
+
+  @HasMany(() => Payment)
+  payments: Payment[];
+
+  @HasMany(() => MedicalRecord)
+  medicalRecords: MedicalRecord[];
+
+  @HasMany(() => LabTest)
+  labTests: LabTest[];
+
+  @HasMany(() => Prescription)
+  prescriptions: Prescription[];
+
 }

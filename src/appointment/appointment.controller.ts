@@ -26,8 +26,8 @@ import { UserGuard } from "../common/guards/user.guard";
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Create a new appointment" })
   @ApiBody({ type: CreateAppointmentDto })
@@ -51,8 +51,8 @@ export class AppointmentController {
     return this.appointmentService.findOne(+id);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update an appointment by ID" })
   @ApiParam({ name: "id", description: "Appointment ID" })
@@ -65,8 +65,8 @@ export class AppointmentController {
     return this.appointmentService.update(+id, updateAppointmentDto);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete an appointment by ID" })
   @ApiParam({ name: "id", description: "Appointment ID" })

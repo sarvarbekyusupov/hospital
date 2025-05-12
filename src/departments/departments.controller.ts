@@ -26,8 +26,8 @@ import { Roles } from "../common/decorators/role.decorator";
 export class DepartmentsController {
   constructor(private readonly departmentsService: DepartmentService) {}
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Create a new department" })
   @ApiBody({ type: CreateDepartmentDto })
@@ -51,8 +51,8 @@ export class DepartmentsController {
     return this.departmentsService.findOne(+id);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Update a department by ID" })
   @ApiParam({ name: "id", description: "Department ID" })
@@ -65,8 +65,8 @@ export class DepartmentsController {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
-  @UseGuards(UserGuard)
-  @Roles("admin")
+  // @UseGuards(UserGuard)
+  // @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Delete a department by ID" })
   @ApiParam({ name: "id", description: "Department ID" })
